@@ -1,0 +1,188 @@
+public class RecordCalificaciones {
+
+    static final int NUM_ESTUDIANTES = 10;
+    static final int NUM_TAREAS = 5;
+
+    static String[] nombres = {
+        "Ana García",
+        "Carlos López",
+        "María Torres",
+        "Luis Ramírez",
+        "Sofía Mendoza",
+        "Diego Castro",
+        "Valentina Ríos",
+        "Andrés Mora",
+        "Isabella Cruz",
+        "Miguel Herrera"
+    };
+
+    static String[] tareas = {
+        "Tarea 1 - POO Básica",
+        "Tarea 2 - Herencia",
+        "Tarea 3 - Polimorfismo",
+        "Tarea 4 - Colecciones",
+        "Tarea 5 - Excepciones"
+    };
+
+    static double[][] calificaciones = new double[NUM_ESTUDIANTES][NUM_TAREAS];
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        imprimirEncabezado();
+        capturarCalificaciones(scanner);
+        mostrarReporte();
+
+        scanner.close();
+    }
+
+    // ─────────────────────────────────────────────
+    //  CAPTURA DE DATOS
+    // ─────────────────────────────────────────────
+    static void capturarCalificaciones(Scanner sc) {
+        System.out.println("\n  Ingresa las calificaciones (0.0 – 10.0)\n");
+        separador('-', 55);
+
+        for (int i = 0; i < NUM_ESTUDIANTES; i++) {
+            System.out.printf("\n  Estudiante %d: %s%n", i + 1, nombres[i]);
+
+            for (int j = 0; j < NUM_TAREAS; j++) {
+                double nota = -1;
+                while (nota < 0 || nota > 10) {
+                    System.out.printf("    %-30s: ", tareas[j]);
+                    try {
+                        nota = sc.nextDouble();
+                        if (nota < 0 || nota > 10) {
+                            System.out.println("    ⚠ La nota debe estar entre 0.0 y 10.0");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("    ⚠ Ingresa un número válido");
+                        sc.next();
+                    }
+                }
+                calificaciones[i][j] = nota;
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  REPORTE FINAL
+    // ─────────────────────────────────────────────
+    static void mostrarReporte() {
+        System.out.println("\n\n");
+        imprimirEncabezado();
+
+        // Encabezado de tabla
+        System.out.printf("  %-22s", "Estudiante");
+        for (int j = 0; j < NUM_TAREAS; j++) {
+            System.out.printf("  T%-2d ", j + 1);
+        }
+        System.out.printf("  %s    %s%n", "Promedio", "Estado");
+        separador('=', 75);
+
+        double[] sumasTareas = new double[NUM_TAREAS];
+        int aprobados = 0;
+        int reprobados = 0;
+
+        // Fila por estudiante
+        for (int i = 0; i < NUM_ESTUDIANTES; i++) {
+            double promedioEstudiante = calcularPromedio(calificaciones[i]);
+            String estado = promedioEstudiante >= 6.0 ? "✔ Aprobado" : "✘ Reprobado";
+
+            System.out.printf("  %-22s", nombres[i]);
+
+            for (int j = 0; j < NUM_TAREAS; j++) {
+                System.out.printf("  %4.1f", calificaciones[i][j]);
+                sumasTareas[j] += calificaciones[i][j];
+            }
+
+            System.out.printf("   %6.2f     %s%n", promedioEstudiante, estado);
+
+            if (promedioEstudiante >= 6.0) aprobados++;
+            else reprobados++;
+        }
+
+        separador('-', 75);
+
+        // Promedio por tarea
+        System.out.printf("  %-22s", "Promedio por tarea");
+        for (int j = 0; j < NUM_TAREAS; j++) {
+            double promTarea = sumasTareas[j] / NUM_ESTUDIANTES;
+            System.out.printf("  %4.1f", promTarea);
+        }
+
+        // Promedio general del grupo
+        double promedioGeneral = calcularPromedioGeneral();
+        System.out.printf("   %6.2f%n", promedioGeneral);
+
+        separador('=', 75);
+
+        // Estadísticas
+        System.out.printf("%n  📊 RESUMEN DEL GRUPO%n");
+        separador('-', 40);
+        System.out.printf("  Promedio general del grupo : %.2f%n", promedioGeneral);
+        System.out.printf("  Estudiantes aprobados      : %d / %d%n", aprobados, NUM_ESTUDIANTES);
+        System.out.printf("  Estudiantes reprobados     : %d / %d%n", reprobados, NUM_ESTUDIANTES);
+        System.out.printf("  Nota más alta              : %.1f%n", notaMaxima());
+        System.out.printf("  Nota más baja              : %.1f%n", notaMinima());
+        separador('=', 40);
+
+        // Escala de calificaciones
+        System.out.println("\n  ESCALA DE CALIFICACIONES:");
+        System.out.println("  9.0 – 10.0 → Sobresaliente");
+        System.out.println("  8.0 –  8.9 → Notable");
+        System.out.println("  7.0 –  7.9 → Bien");
+        System.out.println("  6.0 –  6.9 → Suficiente");
+        System.out.println("  0.0 –  5.9 → Insuficiente (Reprobado)");
+        separador('-', 40);
+        System.out.println();
+    }
+
+    // ─────────────────────────────────────────────
+    //  MÉTODOS DE CÁLCULO
+    // ─────────────────────────────────────────────
+    static double calcularPromedio(double[] notas) {
+        double suma = 0;
+        for (double nota : notas) suma += nota;
+        return suma / notas.length;
+    }
+
+    static double calcularPromedioGeneral() {
+        double total = 0;
+        for (double[] fila : calificaciones)
+            for (double nota : fila)
+                total += nota;
+        return total / (NUM_ESTUDIANTES * NUM_TAREAS);
+    }
+
+    static double notaMaxima() {
+        double max = calificaciones[0][0];
+        for (double[] fila : calificaciones)
+            for (double nota : fila)
+                if (nota > max) max = nota;
+        return max;
+    }
+
+    static double notaMinima() {
+        double min = calificaciones[0][0];
+        for (double[] fila : calificaciones)
+            for (double nota : fila)
+                if (nota < min) min = nota;
+        return min;
+    }
+
+    // ─────────────────────────────────────────────
+    //  UTILIDADES DE IMPRESIÓN
+    // ─────────────────────────────────────────────
+    static void imprimirEncabezado() {
+        separador('=', 55);
+        System.out.println("   RECORD DE CALIFICACIONES — PROGRAMACIÓN JAVA");
+        System.out.println("   Materia: Programación Orientada a Objetos");
+        System.out.println("   Semestre: 2026-1");
+        separador('=', 55);
+    }
+
+    static void separador(char c, int largo) {
+        System.out.println("  " + String.valueOf(c).repeat(largo));
+    }
+}
