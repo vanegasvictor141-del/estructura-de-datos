@@ -1,0 +1,47 @@
+public class Main {
+
+    // 1. Crear record
+    record Estudiante(String nombre, String cedula, double promedio) {}
+
+    public static void main(String[] args) {
+
+        // 2. Arreglo con 4 estudiantes
+        Estudiante[] estudiantes = {
+            new Estudiante("Juan", "8-123-456", 85.5),
+            new Estudiante("Maria", "8-222-333", 90.0),
+            new Estudiante("Carlos", "8-444-555", 78.5),
+            new Estudiante("Ana", "8-666-777", 95.0)
+        };
+
+        // 3. Recorrer arreglo e imprimir nombre + promedio
+        System.out.println("Lista de estudiantes:");
+
+        for (Estudiante e : estudiantes) {
+            System.out.println(
+                "Nombre: " + e.nombre() +
+                " | Promedio: " + e.promedio()
+            );
+        }
+
+        // 4. Set<String> con cédulas
+        Set<String> cedulas = new HashSet<>();
+
+        cedulas.add("8-123-456");
+        cedulas.add("8-222-333");
+        cedulas.add("8-123-456"); // duplicado
+
+        System.out.println("\nCedulas registradas:");
+        System.out.println(cedulas);
+
+        // 5. Calcular promedio general
+        double suma = 0;
+
+        for (Estudiante e : estudiantes) {
+            suma += e.promedio();
+        }
+
+        double promedioGeneral = suma / estudiantes.length;
+
+        System.out.println("\nPromedio general: " + promedioGeneral);
+    }
+}
